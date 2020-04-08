@@ -1,4 +1,4 @@
-# Create a manager of your favorite series with hooks and reactstrap:q!
+# Create a manager of your favorite series with hooks and reactstrap
 
 ## Criação: 13 de Setembro de 2019
 ## Prática : @reluviari
@@ -20,7 +20,7 @@
 ## Server initialization
 
 ```sh
- $ cd node_modules && git clone
+ $ cd node_modules && git clone git@github.com:reluviari/series-node.git
 ```
 
 ## Run development project

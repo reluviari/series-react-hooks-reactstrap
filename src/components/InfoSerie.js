@@ -1,94 +1,132 @@
-import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-import { Redirect } from 'react-router-dom'
-import { Badge } from 'reactstrap'
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Redirect } from "react-router-dom";
+import { Badge } from "reactstrap";
 
-const InfoSerie = ({match}) => {
+const InfoSerie = ({ match }) => {
+	const [name, setName] = useState("");
+	const [success, setSuccess] = useState(false);
+	const [errorApi, setErrorApi] = useState(false);
 
-    const [name, setName] = useState('')
+	const mode = useState("EDIT");
 
-    const [success, setSuccess] = useState(false)
+	const [data, setData] = useState({});
 
-    const [mode, setMode] = useState('INFO')
+	useEffect(() => {
+		axios
+			.get("/api/series/" + match.params.id)
+			.then((res) => {
+				setData(res.data);
+			})
+			.catch((error) => {
+				setErrorApi(true);
+			});
+	}, [match.params.id]);
 
-    const [data, setData] = useState({})
+	//Custom Header
+	const masterHeader = {
+		height: "50vh",
+		minHeight: "500px",
+		backgroundImage: `url('${data.background}')`,
+		backgroundSize: "cover",
+		backgroundPosition: "center",
+		backgroundRepeat: "no-repeat",
+	};
 
-    useEffect(() => {
-      axios
-        .get('/api/series/' + match.params.id)
-        .then(res => {
-          setData(res.data)
-        })
-    }, [match.params.id])
+	const onChange = (event) => {
+		setName(event.target.value);
+	};
 
-    //Custom Header
-    const masterHeader = {
-      height:'50vh',
-      minHeight:'500px',
-      backgroundImage: `url('${data.background}')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
-    }
+	const onSave = () => {
+		axios
+			.post("/api/series/", {
+				name,
+			})
+			.then(() => {
+				setSuccess(true);
+			})
+			.catch((error) => {
+				alert(
+					`Opsss... Houve um problema ao salvar o registro - ${error}`
+				);
+			});
+	};
 
-    const onChange = event => {
-        setName(event.target.value)
-    }
+	if (errorApi) {
+		return (
+			<div className='container'>
+				<h1>Séries Info</h1>
+				<div
+					className='alert alert-danger alert-dismissible fade show'
+					role='alert'>
+					<strong>
+						Opsss... Houve um problema ao carregar as infos da
+						série. Tente novamente mais tarde!
+					</strong>
+				</div>
+			</div>
+		);
+	}
 
-    const onSave = () => {
-        axios.post('/api/series/', {
-            name
-        })
-            .then(res => {
-                setSuccess(true)
-            })
-    }
+	if (success) {
+		return <Redirect to='/series' />;
+	}
 
-    if (success) {
-        return (
-            <div>
-               <Redirect to='/series' />
-            </div>
-        )
-    }
+	return (
+		<div>
+			<header style={masterHeader}>
+				<div
+					className='h-100'
+					style={{ background: "rgba(0,0,0,0.7)" }}>
+					<div className='h-100 container'>
+						<div className='row h-100 align-items-center'>
+							<div className='col-3'>
+								<img
+									src={data.poster}
+									alt={data.name}
+									className='img-fluid img-thumbnail'
+								/>
+							</div>
+							<div className='col-9'>
+								<h1 className='font-weight-light text-white'>
+									{data.name}
+								</h1>
+								<div className='lead text-white'>
+									<Badge color='success'>Assistido</Badge>
+									<Badge color='warning'>Assistir</Badge>
+									<p>Gênero: {data.genre}</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+			{mode === "EDIT" && (
+				<div className='container'>
+					<h1>Informações da Série</h1>
+					<form>
+						<div className='form-group'>
+							<label htmlFor='name'>Nome</label>
+							<input
+								type='text'
+								value={name}
+								onChange={onChange}
+								className='form-control'
+								id='name'
+								placeholder='Série'
+							/>
+						</div>
+						<button
+							type='button'
+							onClick={onSave}
+							className='btn btn-primary'>
+							Salvar
+						</button>
+					</form>
+				</div>
+			)}
+		</div>
+	);
+};
 
-    return (
-        <div>
-          <header style={masterHeader}>
-            <div className="h-100" style={{ background: 'rgba(0,0,0,0.7)' }}>
-              <div className='h-100 container'>
-              <div className="row h-100 align-items-center">
-                <div className="col-3">
-                  <img src={data.poster} alt={data.name} className='img-fluid img-thumbnail'/>
-                </div>
-                <div className="col-9">
-                  <h1 className='font-weight-light text-white'>{data.name}</h1>
-                  <div className="lead text-white">
-                    <Badge color='success'>Assistido</Badge>
-                    <Badge color='warning'>Assistir</Badge>
-                    <p>Gênero: {data.genre}</p>
-                  </div>
-                </div>
-              </div>
-              </div>
-            </div>
-          </header>
-          {
-            mode === 'EDIT' &&
-          <div className='container'>
-            <h1>Informações da Série</h1>
-            <form>
-                <div className='form-group'>
-                    <label htmlFor='name'>Nome</label>
-                    <input type='text' value={name} onChange={onChange} className='form-control' id='name' placeholder='Série' />
-                </div>
-                <button type='button' onClick={onSave} className='btn btn-primary'>Salvar</button>
-            </form>
-          </div>
-          }
-        </div>          
-    )
-}
-
-
-export default InfoSerie 
+export default InfoSerie;
