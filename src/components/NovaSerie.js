@@ -32,6 +32,7 @@ const NovaSerie = () => {
 	return (
 		<div className='container'>
 			<h1>Adicionar Série</h1>
+			<hr />
 			<form>
 				<div className='form-group'>
 					<label htmlFor='name'>Nome</label>
@@ -47,7 +48,7 @@ const NovaSerie = () => {
 				<button
 					type='button'
 					onClick={onSave}
-					className='btn btn-primary'>
+					className='btn btn-success'>
 					Salvar
 				</button>
 			</form>

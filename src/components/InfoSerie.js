@@ -4,12 +4,14 @@ import { Redirect } from "react-router-dom";
 import { Badge } from "reactstrap";
 
 const InfoSerie = ({ match }) => {
-	const [name, setName] = useState("");
+	const [form, setForm] = useState({
+		name: "",
+		comments: "",
+	});
+	const [genres, setGenres] = useState([]);
 	const [success, setSuccess] = useState(false);
 	const [errorApi, setErrorApi] = useState(false);
-
-	const mode = useState("EDIT");
-
+	const [mode, setMode] = useState("INFO");
 	const [data, setData] = useState({});
 
 	useEffect(() => {
@@ -17,11 +19,18 @@ const InfoSerie = ({ match }) => {
 			.get("/api/series/" + match.params.id)
 			.then((res) => {
 				setData(res.data);
+				setForm(res.data);
 			})
 			.catch((error) => {
 				setErrorApi(true);
 			});
 	}, [match.params.id]);
+
+	useEffect(() => {
+		axios.get("/api/genres").then((res) => {
+			setGenres(res.data.data);
+		});
+	}, [data]);
 
 	//Custom Header
 	const masterHeader = {
@@ -33,15 +42,23 @@ const InfoSerie = ({ match }) => {
 		backgroundRepeat: "no-repeat",
 	};
 
-	const onChange = (event) => {
-		setName(event.target.value);
+	const onChange = (field) => (event) => {
+		setForm({
+			...form,
+			[field]: event.target.value,
+		});
+	};
+
+	const seleciona = (value) => () => {
+		setForm({
+			...form,
+			status: value,
+		});
 	};
 
 	const onSave = () => {
 		axios
-			.post("/api/series/", {
-				name,
-			})
+			.put(`/api/series/${match.params.id}`, form)
 			.then(() => {
 				setSuccess(true);
 			})
@@ -55,7 +72,8 @@ const InfoSerie = ({ match }) => {
 	if (errorApi) {
 		return (
 			<div className='container'>
-				<h1>Séries Info</h1>
+				<h1>Informações da Série</h1>
+				<hr />
 				<div
 					className='alert alert-danger alert-dismissible fade show'
 					role='alert'>
@@ -92,9 +110,43 @@ const InfoSerie = ({ match }) => {
 									{data.name}
 								</h1>
 								<div className='lead text-white'>
-									<Badge color='success'>Assistido</Badge>
-									<Badge color='warning'>Assistir</Badge>
+									{data.status === "ASSISTIDO" && (
+										<Badge color='success'>Assistido</Badge>
+									)}
+									{data.status === "PARA_ASSISTIR" && (
+										<Badge color='warning'>
+											Para Assistir
+										</Badge>
+									)}
 									<p>Gênero: {data.genre}</p>
+								</div>
+								<div>
+									{mode === "INFO" && (
+										<div>
+											<p>
+												<button
+													className='btn btn-primary'
+													onClick={() =>
+														setMode("EDIT")
+													}>
+													Editar
+												</button>
+											</p>
+										</div>
+									)}
+									{mode === "EDIT" && (
+										<div>
+											<p>
+												<button
+													className='btn btn-warning'
+													onClick={() =>
+														setMode("INFO")
+													}>
+													Fechar
+												</button>
+											</p>
+										</div>
+									)}
 								</div>
 							</div>
 						</div>
@@ -104,23 +156,89 @@ const InfoSerie = ({ match }) => {
 			{mode === "EDIT" && (
 				<div className='container'>
 					<h1>Informações da Série</h1>
+					<hr />
 					<form>
 						<div className='form-group'>
 							<label htmlFor='name'>Nome</label>
 							<input
 								type='text'
-								value={name}
-								onChange={onChange}
+								value={form.name}
+								onChange={onChange("name")}
 								className='form-control'
 								id='name'
-								placeholder='Série'
+								placeholder='Informe o Nome da Série'
+							/>
+						</div>
+						<div className='form-group'>
+							<label htmlFor='name'>Gêneros</label>
+							<select
+								className='form-control'
+								id='genre'
+								value={form.genre_id}
+								onChange={onChange("genre_id")}>
+								{genres.map((genre) => (
+									<option key={genre.id} value={genre.id}>
+										{genre.name}
+									</option>
+								))}
+							</select>
+						</div>
+						<div className='form-group'>
+							<div className='form-check'>
+								<input
+									className='form-check-input'
+									type='radio'
+									name='status'
+									id='paraAssistir'
+									value='PARA_ASSISTIR'
+									onChange={seleciona("PARA_ASSISTIR")}
+									checked={form.status === "PARA_ASSISTIR"}
+								/>
+								<label
+									className='form-check-label'
+									htmlFor='paraAssistir'>
+									Para Assistir
+								</label>
+							</div>
+							<div className='form-check'>
+								<input
+									className='form-check-input'
+									type='radio'
+									name='status'
+									id='assistido'
+									value='ASSISTIDO'
+									onChange={seleciona("ASSISTIDO")}
+									checked={form.status === "ASSISTIDO"}
+								/>
+								<label
+									className='form-check-label'
+									htmlFor='assistido'>
+									Assistido
+								</label>
+							</div>
+						</div>
+
+						<div className='form-group'>
+							<label htmlFor='name'>Comentários</label>
+							<input
+								type='text'
+								value={form.comments}
+								onChange={onChange("comments")}
+								className='form-control'
+								id='comments'
+								placeholder='Informe os Comentários'
 							/>
 						</div>
 						<button
 							type='button'
 							onClick={onSave}
-							className='btn btn-primary'>
+							className='btn btn-success'>
 							Salvar
+						</button>
+						<button
+							className='btn btn-warning'
+							onClick={() => setMode("INFO")}>
+							Cancelar
 						</button>
 					</form>
 				</div>

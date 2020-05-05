@@ -46,6 +46,7 @@ const EditarGenero = ({ match }) => {
 		return (
 			<div className='container'>
 				<h1>Editar Gênero</h1>
+				<hr />
 				<div
 					className='alert alert-danger alert-dismissible fade show'
 					role='alert'>
@@ -64,7 +65,8 @@ const EditarGenero = ({ match }) => {
 
 	return (
 		<div className='container'>
-			<h1>Editar gênero</h1>
+			<h1>Editar Gênero</h1>
+			<hr />
 			<form>
 				<div className='form-group'>
 					<label htmlFor='name'>Nome</label>
@@ -80,7 +82,7 @@ const EditarGenero = ({ match }) => {
 				<button
 					type='button'
 					onClick={onSave}
-					className='btn btn-primary'>
+					className='btn btn-success'>
 					Salvar
 				</button>
 			</form>
