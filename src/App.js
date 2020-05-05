@@ -16,7 +16,7 @@ function App() {
 			<Router>
 				<Header />
 				<Switch>
-					<Route path='/' exact component={Home} />
+					<Route path='/' exact component={Series} />
 					<Route path='/generos' exact component={Generos} />
 					<Route path='/generos/novo' exact component={NovoGenero} />
 					<Route path='/generos/:id' component={EditarGenero} />
