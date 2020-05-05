@@ -11,6 +11,10 @@
 ![Git](/images/logo-git.png)
 ![GitHub](/images/logo-github.png)
 
+## Link to App
+
+You can visit the app by clicking this link: [Access App](https://reluviaris-series.herokuapp.com/).
+
 ## Configuration
 
 ```sh
