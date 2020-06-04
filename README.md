@@ -1,4 +1,4 @@
-# Create a manager of your favorite series with hooks and reactstrap
+# A manager of your favorite series with hooks and reactstrap
 
 ## Criação: 13 de Setembro de 2019
 ## Prática : @reluviari
